@@ -1,1 +1,60 @@
+<form action="/processar-cadastro" method="post">
+   <h1>PÁGINA DE CADASTRO</h1> 
+    <!-- 1- Nome Completo -->
+    <div>
+        <label for="nome">Nome Completo:</label>
+        <input type="text" id="nome" name="nome" minlength="3" maxlength="50" placeholder="Digite seu nome completo" required>
+    </div>
+
+    <!-- 2- Email -->
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="exemplo@alagaai.com" required>
+    </div>
+  <!-- 3-Telefone -->
+    <div>
+        <label for="telefone">Telefone:</label>
+        <input type="telefone" id="telefone" name="telefone" placeholder="(81) 12345678" required>
+    </div>
+
+    <!-- 4-CEP -->
+    <div>
+        <label for="cep">CEP:</label>
+        <input type="cep" id="CEP" name="senha" minlength="2" maxlength="8" placeholder="12345-678" required>
+    </div>
+
+    <!-- 5-Rua -->
+    <div>
+        <label for="rua">Rua:</label><br>
+        <textarea id="rua" name="rua" maxlength="100" placeholder="Rua João II, 123"></textarea>
+    </div>
+
+    <!-- Endereço -->
+      <!-- 6-Número da Casa -->
+    <div>
+        <label for="telefone">Número da Casa:</label>
+        <input type="número da casa" id="número da casa" name="número da casa" placeholder="123" required>
+    </div>
+        <!-- 7-Cidade -->
+    <div>
+        <label for="cidade">Cidade:</label>
+        <input type="cidade" id="cidade" name="cidade" placeholder="Jaboatão Dos Guararapes" required>
+    </div>
+      <!-- 8- -->
+    <div>
+        <label for="telefone">Telefone:</label>
+        <input type="telefone" id="telefone" name="telefone" placeholder="(81) 12345678" required>
+    </div>
+
+    <div>
+        <label for="telefone">Ponto de Referencia:</label>
+        <input type="telefone" id="telefone" name="Ponto de referência" placeholder="Perto da Rua São Sebastião" required>
+    </div>
+
+      <div class="botoes">
+    <button type="submit" class="btn-enviar">Enviar Cadastro</button>
+    <button type="reset" class="btn-limpar">Limpar</button>
+  </div>
+</form>
+
 //teste
