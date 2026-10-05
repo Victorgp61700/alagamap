@@ -1,60 +1,309 @@
-<form action="/processar-cadastro" method="post">
-   <h1>PÁGINA DE CADASTRO</h1> 
-    <!-- 1- Nome Completo -->
-    <div>
-        <label for="nome">Nome Completo:</label>
-        <input type="text" id="nome" name="nome" minlength="3" maxlength="50" placeholder="Digite seu nome completo" required>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Alaga Map — Alagamentos em Recife</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Configuração Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Estilos Personalizados -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-900 text-slate-100 flex flex-col font-sans antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- CABEÇALHO COMPACTO -->
+  <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3 shrink-0">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-teal-400 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <i class="fa-solid fa-water text-white text-lg"></i>
+        </div>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-sky-400 to-teal-300 bg-clip-text text-transparent">Alaga Map</span>
+          <span class="text-[10px] bg-sky-950 text-sky-400 border border-sky-800/80 px-2 py-0.5 rounded-full ml-1 font-semibold">Ao Vivo</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <button onclick="getUserLocation()" class="p-2.5 bg-slate-800 text-sky-400 border border-slate-700/80 rounded-xl active:bg-slate-700 transition" title="Minha localização">
+          <i class="fa-solid fa-crosshairs text-base"></i>
+        </button>
+        <button onclick="toggleReportModal(true)" class="bg-gradient-to-r from-amber-500 to-red-600 active:from-amber-600 active:to-red-700 text-white font-semibold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-red-500/10">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Reportar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL COM ABAS PARACEIS EM CELULAR -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 pb-20 md:pb-6 flex flex-col gap-4">
+    
+    <!-- CARDS DE ESTATÍSTICAS (Padrão: Visível em Desktop / Alternável no Mobile) -->
+    <div id="section-stats" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] sm:text-xs font-medium text-slate-400">Pontos Ativos</p>
+          <p class="text-xl sm:text-2xl font-bold mt-0.5" id="stat-active-count">4</p>
+        </div>
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+          <i class="fa-solid fa-cloud-showers-heavy text-base sm:text-lg"></i>
+        </div>
+      </div>
+      
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] sm:text-xs font-medium text-slate-400">Nível na Região</p>
+          <p class="text-xl sm:text-2xl font-bold text-amber-400 mt-0.5">Atenção</p>
+        </div>
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center pulse-alert">
+          <i class="fa-solid fa-shield-halved text-base sm:text-lg"></i>
+        </div>
+      </div>
+      
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] sm:text-xs font-medium text-slate-400">Alertas Graves</p>
+          <p class="text-xl sm:text-2xl font-bold text-rose-500 mt-0.5" id="stat-critical-count">2</p>
+        </div>
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center">
+          <i class="fa-solid fa-circle-exclamation text-base sm:text-lg"></i>
+        </div>
+      </div>
+      
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] sm:text-xs font-medium text-slate-400">Última Atualização</p>
+          <p class="text-xl sm:text-2xl font-bold text-sky-400 mt-0.5">2 min</p>
+        </div>
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center">
+          <i class="fa-solid fa-arrows-rotate text-base sm:text-lg"></i>
+        </div>
+      </div>
     </div>
 
-    <!-- 2- Email -->
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="exemplo@alagaai.com" required>
-    </div>
-  <!-- 3-Telefone -->
-    <div>
-        <label for="telefone">Telefone:</label>
-        <input type="telefone" id="telefone" name="telefone" placeholder="(81) 12345678" required>
-    </div>
+    <!-- MAPA E LISTA -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+      
+      <!-- SEÇÃO DO MAPA -->
+      <section id="section-map" class="md:col-span-2 relative flex flex-col bg-slate-800/40 border border-slate-700/60 rounded-2xl p-1.5 sm:p-2 h-[calc(100vh-210px)] md:h-[550px] overflow-hidden">
+        
+        <!-- BARRA SUPERIOR DE PESQUISA E FILTROS -->
+        <div class="absolute top-3 left-3 right-3 z-20 flex flex-col gap-2">
+          <!-- Campo de Busca -->
+          <div class="relative w-full">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" id="map-search" placeholder="Buscar bairro, rua ou localidade..." class="w-full bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xl" onkeydown="if(event.key==='Enter')searchLocation()">
+            <button onclick="searchLocation()" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-sky-400">
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+          
+          <!-- Filtros Horizontais com Scroll Suave no Celular -->
+          <div class="no-scrollbar flex items-center gap-1.5 overflow-x-auto bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-1 rounded-xl shadow-xl">
+            <button onclick="filterMap('todos',this)" class="filter-btn shrink-0 bg-sky-600 text-white px-3 py-1.5 text-xs font-semibold rounded-lg transition">Todos</button>
+            <button onclick="filterMap('grave',this)" class="filter-btn shrink-0 text-slate-300 px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 transition">🔴 Grave</button>
+            <button onclick="filterMap('moderado',this)" class="filter-btn shrink-0 text-slate-300 px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 transition">🟡 Moderado</button>
+            <button onclick="filterMap('leve',this)" class="filter-btn shrink-0 text-slate-300 px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-800 transition">🟢 Leve</button>
+          </div>
+        </div>
 
-    <!-- 4-CEP -->
-    <div>
-        <label for="cep">CEP:</label>
-        <input type="cep" id="CEP" name="senha" minlength="2" maxlength="8" placeholder="12345-678" required>
-    </div>
+        <!-- CONTAINER LEAFLET -->
+        <div id="map" class="shadow-inner"></div>
 
-    <!-- 5-Rua -->
-    <div>
-        <label for="rua">Rua:</label><br>
-        <textarea id="rua" name="rua" maxlength="100" placeholder="Rua João II, 123"></textarea>
-    </div>
+        <!-- LEGENDA COMPACTA (FLUTUANTE NO CANTO INFERIOR) -->
+        <div class="absolute bottom-3 left-3 right-3 sm:right-auto z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl p-2.5 shadow-xl">
+          <div class="flex items-center justify-between sm:justify-start gap-3 text-[11px] font-medium">
+            <span class="flex items-center"><i class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></i>Passável</span>
+            <span class="flex items-center"><i class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1.5"></i>Moderado</span>
+            <span class="flex items-center"><i class="w-2.5 h-2.5 rounded-full bg-rose-600 mr-1.5"></i>Intransitável</span>
+          </div>
+        </div>
+      </section>
 
-    <!-- Endereço -->
-      <!-- 6-Número da Casa -->
-    <div>
-        <label for="telefone">Número da Casa:</label>
-        <input type="número da casa" id="número da casa" name="número da casa" placeholder="123" required>
-    </div>
-        <!-- 7-Cidade -->
-    <div>
-        <label for="cidade">Cidade:</label>
-        <input type="cidade" id="cidade" name="cidade" placeholder="Jaboatão Dos Guararapes" required>
-    </div>
-      <!-- 8- -->
-    <div>
-        <label for="telefone">Telefone:</label>
-        <input type="telefone" id="telefone" name="telefone" placeholder="(81) 12345678" required>
-    </div>
+      <!-- SEÇÃO DO FEED DE RELATOS -->
+      <aside id="section-feed" class="hidden md:flex bg-slate-800/40 border border-slate-700/60 rounded-2xl p-3 sm:p-4 flex-col h-[calc(100vh-210px)] md:h-[550px]">
+        <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-700/60 shrink-0">
+          <h2 class="font-bold text-sm sm:text-base flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-sky-400"></i>
+            Relatos Recentes
+          </h2>
+          <span class="text-[11px] text-slate-400 bg-slate-700/50 px-2 py-0.5 rounded-lg">Recife, PE</span>
+        </div>
+        
+        <!-- Feed Scrollável -->
+        <div id="reports-feed" class="flex-1 overflow-y-auto space-y-2.5 pr-1 no-scrollbar"></div>
 
-    <div>
-        <label for="telefone">Ponto de Referencia:</label>
-        <input type="telefone" id="telefone" name="Ponto de referência" placeholder="Perto da Rua São Sebastião" required>
-    </div>
+        <div class="mt-3 pt-3 border-t border-slate-700/60 text-xs text-slate-400 flex items-center justify-between shrink-0">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-cat text-teal-400"></i> Defesa Civil: <strong>199</strong>
+          </span>
+          <a href="tel:199" class="text-sky-400 font-semibold hover:underline">Ligar</a>
+        </div>
+      </aside>
 
-      <div class="botoes">
-    <button type="submit" class="btn-enviar">Enviar Cadastro</button>
-    <button type="reset" class="btn-limpar">Limpar</button>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAVIGATION BAR (FIXA PARA CELULARES) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 z-40 flex items-center justify-around py-2 px-1 safe-area-bottom">
+    <button onclick="switchTab('map')" id="nav-btn-map" class="flex flex-col items-center gap-1 text-sky-400 w-1/4">
+      <i class="fa-solid fa-map text-lg"></i>
+      <span class="text-[10px] font-semibold">Mapa</span>
+    </button>
+    
+    <button onclick="switchTab('feed')" id="nav-btn-feed" class="flex flex-col items-center gap-1 text-slate-400 w-1/4">
+      <i class="fa-solid fa-list-ul text-lg"></i>
+      <span class="text-[10px] font-semibold">Relatos</span>
+    </button>
+    
+    <button onclick="toggleReportModal(true)" class="flex flex-col items-center gap-1 text-amber-400 w-1/4">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500 to-red-600 text-white flex items-center justify-center shadow-lg -mt-3">
+        <i class="fa-solid fa-plus text-sm"></i>
+      </div>
+      <span class="text-[10px] font-semibold">Alertar</span>
+    </button>
+    
+    <button onclick="switchTab('stats')" id="nav-btn-stats" class="flex flex-col items-center gap-1 text-slate-400 w-1/4">
+      <i class="fa-solid fa-chart-pie text-lg"></i>
+      <span class="text-[10px] font-semibold">Status</span>
+    </button>
+  </nav>
+
+  <!-- MODAL DE REPORTAR (ESTILO BOTTOM SHEET NO MOBILE) -->
+  <div id="report-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(event.target===this)toggleReportModal(false)">
+    <div id="report-modal-content" class="bg-slate-900 border-t sm:border border-slate-700 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Puxador tátil do mobile -->
+      <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
+
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="font-bold text-base sm:text-lg flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+          Reportar Alagamento
+        </h3>
+        <button onclick="toggleReportModal(false)" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <form id="form-report" onsubmit="handleReportSubmit(event)" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Localização / Endereço</label>
+          <div class="relative">
+            <input id="input-location" required type="text" placeholder="Ex: Av. Agamenon Magalhães, Derby" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-3 pr-20 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <button type="button" onclick="useCurrentLocation()" class="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs bg-slate-700 text-sky-400 px-2.5 py-2 rounded-lg active:bg-slate-600 font-medium flex items-center gap-1">
+              <i class="fa-solid fa-location-crosshairs"></i> GPS
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Gravidade da Situação</label>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="severity" value="leve" class="peer sr-only">
+              <div class="text-center p-3 rounded-xl border border-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 text-xs font-medium text-slate-300">🟢 Leve</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="severity" value="moderado" checked class="peer sr-only">
+              <div class="text-center p-3 rounded-xl border border-slate-700 peer-checked:border-amber-500 peer-checked:bg-amber-500/10 text-xs font-medium text-slate-300">🟡 Moderado</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="severity" value="grave" class="peer sr-only">
+              <div class="text-center p-3 rounded-xl border border-slate-700 peer-checked:border-rose-500 peer-checked:bg-rose-500/10 text-xs font-medium text-slate-300">🔴 Grave</div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Descrição / Detalhes</label>
+          <textarea id="input-desc" rows="3" placeholder="Informe a altura da água, se carros passam, etc." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Foto da situação (opcional)</label>
+          <input id="input-photo" type="file" accept="image/*" capture="environment" class="w-full text-xs text-slate-400 file:mr-3 file:rounded-xl file:border-0 file:bg-slate-700 file:px-3 file:py-2.5 file:text-slate-200">
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="button" onclick="toggleReportModal(false)" class="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-sm font-semibold">Cancelar</button>
+          <button type="submit" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-3 rounded-xl text-sm font-bold shadow-lg shadow-sky-600/20">Enviar Alerta</button>
+        </div>
+      </form>
+    </div>
   </div>
-</form>
 
-//teste
+  <!-- MODAL DE DETALHES DA RUA -->
+  <div id="street-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(event.target===this)closeStreetModal()">
+    <div class="bg-slate-900 border-t sm:border border-slate-700 rounded-t-3xl sm:rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
+
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-[11px] text-sky-400 font-semibold uppercase tracking-wide">Detalhes do local</p>
+          <h3 id="street-title" class="text-base sm:text-lg font-bold mt-0.5"></h3>
+        </div>
+        <button onclick="closeStreetModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <p id="street-desc" class="text-xs sm:text-sm text-slate-300 mt-3 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50"></p>
+      <p id="street-time" class="text-xs text-slate-400 mt-2 font-medium"></p>
+
+      <div class="grid grid-cols-2 gap-2.5 mt-4">
+        <a id="maps-link" target="_blank" rel="noopener noreferrer" class="text-center bg-sky-600 active:bg-sky-700 text-white rounded-xl py-3 text-xs font-bold flex items-center justify-center gap-1.5 shadow-md">
+          <i class="fa-solid fa-map-location-dot"></i> Google Maps
+        </a>
+        <a id="streetview-link" target="_blank" rel="noopener noreferrer" class="text-center bg-slate-800 active:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl py-3 text-xs font-bold flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-street-view"></i> Street View
+        </a>
+      </div>
+
+      <div class="mt-5 pt-4 border-t border-slate-800">
+        <div class="flex items-center justify-between">
+          <h4 class="font-semibold text-xs sm:text-sm flex items-center gap-2">
+            <i class="fa-regular fa-images text-sky-400"></i> Fotos enviadas pela comunidade
+          </h4>
+          <span id="photo-count" class="text-xs text-slate-500"></span>
+        </div>
+        <div id="street-photos" class="grid grid-cols-2 gap-2.5 mt-3"></div>
+        <p id="no-photos" class="hidden text-xs text-slate-500 mt-3 text-center py-4 bg-slate-800/30 rounded-xl">Nenhuma foto enviada para este alerta.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST DE NOTIFICAÇÃO (SUPERIOR PARA EVITAR SOBREPOSIÇÃO NO MOBILE) -->
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-[70] bg-slate-800 border border-slate-700 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none w-[90%] max-w-sm">
+    <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg shrink-0"></i>
+    <span id="toast-message" class="text-xs sm:text-sm font-medium"></span>
+  </div>
+
+  <!-- JS Principal -->
+  <script src="app.js"></script>
+</body>
+</html>
