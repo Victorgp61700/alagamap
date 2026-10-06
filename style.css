@@ -1,24 +1,37 @@
-/* Configurações Globais do Mapa */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
 #map {
   width: 100%;
   height: 100%;
+  min-height: 300px;
   z-index: 10;
-  border-radius: 0.75rem;
+  border-radius: .75rem;
 }
 
-/* Ajustes Leaflet */
 .leaflet-container {
-  font-family: 'Inter', sans-serif !important;
+  font-family: Inter, sans-serif !important;
 }
 
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
   background: #0f172a;
   color: #f8fafc;
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: 0.75rem;
+  border-radius: .75rem;
   padding: 4px;
 }
 
@@ -26,18 +39,16 @@
   margin: 10px 12px;
 }
 
-/* Otimização de toque nos controles do mapa */
 .leaflet-touch .leaflet-bar a {
   width: 36px !important;
   height: 36px !important;
   line-height: 36px !important;
   border-radius: 8px !important;
-  background-color: #0f172a !important;
+  background: #0f172a !important;
   color: #f8fafc !important;
   border-color: #334155 !important;
 }
 
-/* Animações */
 .pulse-alert {
   animation: pulse 2s infinite;
 }
@@ -45,20 +56,354 @@
 @keyframes pulse {
   50% {
     transform: scale(1.12);
-    opacity: 0.55;
+    opacity: .55;
   }
 }
 
-/* Esconder scrollbar mantendo rolagem funcional */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* Suporte para Safe Area no iOS (Notch / Home Indicator) */
 .safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 8px);
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.stat-card {
+  background: #1e293b99;
+  border: 1px solid #33415599;
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-card > i {
+  font-size: 1.2rem;
+}
+
+.stat-label {
+  font-size: .72rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-top: .15rem;
+}
+
+.filter-btn {
+  flex: none;
+  padding: .4rem .8rem;
+  font-size: .75rem;
+  font-weight: 600;
+  border-radius: .5rem;
+  color: #cbd5e1;
+  transition: all 0.2s;
+}
+
+.active-filter {
+  background: #0284c7;
+  color: white;
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .25rem;
+  color: #94a3b8;
+  width: 18%;
+  font-size: .65rem;
+  font-weight: 600;
+}
+
+.nav-btn i {
+  font-size: 1.1rem;
+}
+
+.active-nav {
+  color: #38bdf8;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: #020617d9;
+  backdrop-filter: blur(5px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+
+.modal-overlay.modal-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-panel, .street-panel, .quiz-panel {
+  width: 100%;
+  max-width: 32rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.quiz-overlay {
+  z-index: 55;
+}
+
+.quiz-panel {
+  max-width: 38rem;
+  padding: 1.5rem;
+}
+
+.quiz-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.quiz-progress {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  color: #cbd5e1;
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.quiz-track {
+  height: 7px;
+  background: #1e293b;
+  border-radius: 999px;
+  margin-top: .6rem;
+  overflow: hidden;
+}
+
+.quiz-track > div {
+  height: 100%;
+  width: 5%;
+  background: linear-gradient(90deg, #14b8a6, #38bdf8);
+  transition: width .25s;
+}
+
+.quiz-question-area {
+  padding: 1.5rem 0;
+}
+
+.quiz-option {
+  width: 100%;
+  text-align: left;
+  padding: .85rem 1rem;
+  border: 1px solid #334155;
+  background: #1e293b;
+  border-radius: .8rem;
+  color: #e2e8f0;
+  transition: .15s;
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: #2dd4bf;
+  background: #134e4a55;
+}
+
+.quiz-option.correct {
+  border-color: #10b981;
+  background: #064e3b;
+  color: #a7f3d0;
+}
+
+.quiz-option.incorrect {
+  border-color: #f43f5e;
+  background: #4c0519;
+  color: #fecdd3;
+}
+
+.quiz-option:disabled {
+  cursor: default;
+}
+
+.quiz-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+}
+
+.street-panel {
+  max-width: 32rem;
+}
+
+.leaflet-control-attribution {
+  font-size: 9px !important;
+}
+
+.auth-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: radial-gradient(ellipse at top, #164e63 0%, #0f172a 55%);
+}
+
+.auth-card {
+  width: min(100%, 26rem);
+  padding: 2rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 1.5rem;
+  box-shadow: 0 24px 70px #02061788;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #67e8f9;
+}
+.auth-caption {
+  text-align: center;
+  color: #94a3b8;
+  font-size: .88rem;
+  line-height: 1.5;
+  margin: .85rem 0 1.5rem;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .35rem;
+  padding: .3rem;
+  border-radius: .8rem;
+  background: #1e293b;
+  margin-bottom: 1.35rem;
+}
+
+.auth-tab {
+  padding: .65rem;
+  border: 0;
+  border-radius: .6rem;
+  background: transparent;
+  color: #94a3b8;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  background: #334155;
+  color: #f8fafc;
+}
+
+.auth-label {
+  display: block;
+  margin: .9rem 0 .4rem;
+  color: #cbd5e1;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.auth-input {
+  width: 100%;
+  padding: .8rem .9rem;
+  border-radius: .7rem;
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #f8fafc;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.auth-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px #0ea5e933;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: .85rem;
+  border: 0;
+  border-radius: .75rem;
+  background: linear-gradient(90deg, #0284c7, #0d9488);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.auth-submit:hover {
+  opacity: 0.95;
+}
+
+.auth-message {
+  min-height: 1.25rem;
+  margin: .75rem 0 0;
+  text-align: center;
+  color: #fda4af;
+  font-size: .82rem;
+}
+
+.auth-note {
+  text-align: center;
+  color: #64748b;
+  font-size: .72rem;
+  margin: .25rem 0 0;
+}
+
+@media(max-width:640px) {
+  .quiz-panel {
+    padding: 1.1rem;
+    max-height: 85vh;
+  }
+  .stat-card {
+    padding: .75rem;
+  }
+  .stat-value {
+    font-size: 1.15rem;
+  }
+  .quiz-launch {
+    display: none;
+  }
+  .auth-card {
+    padding: 1.5rem;
+  }
+}
+.auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #67e8f9;
+}
+
+.auth-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: none;
 }
