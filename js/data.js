@@ -1,29 +1,62 @@
-// Dados Iniciais dos Pontos de Alagamento em Recife
 const floodReports = [
-  { id: 1, location: 'Av. Agamenon Magalhães — Derby', severity: 'grave', desc: 'Água na altura do pneu. Trânsito parado no sentido Boa Viagem.', time: 'Há 5 min', lat: -8.0581, lng: -34.8943, photos: [] },
-  { id: 2, location: 'Rua do Espinheiro — Espinheiro', severity: 'moderado', desc: 'Acúmulo de água no meio-fio; carros altos conseguem passar.', time: 'Há 12 min', lat: -8.044, lng: -34.8961, photos: [] },
-  { id: 3, location: 'Avenida Caxangá — Zequinha', severity: 'grave', desc: 'Ponto crítico sob o viaduto. Evite a área.', time: 'Há 25 min', lat: -8.049, lng: -34.922, photos: [] },
-  { id: 4, location: 'Estrada dos Remédios — Afogados', severity: 'leve', desc: 'Pequenos pontos de alagamento, trânsito fluindo devagar.', time: 'Há 40 min', lat: -8.0735, lng: -34.908, photos: [] }
-];
-
-// Perguntas do Quiz de Segurança
-const quizQuestions = [
   {
-    q: "O que você deve fazer ao se deparar com uma rua alagada enquanto dirige?",
-    options: ["Acelerar para passar rápido", "Dar a volta e procurar uma rota alternativa segura", "Engatar a primeira marcha e avançar mesmo sem ver o chão", "Parar no meio da água e esperar abaixar"],
-    answer: 1,
-    explanation: "Nunca tente atravessar pontos de alagamento se não conseguir ver o solo. Procure rotas alternativas."
+    id: 1,
+    location: "Rua do Bosque, Mirueira — Paulista",
+    severity: "grave",
+    desc: "Acúmulo crítico de água próximo à praça. Trânsito bloqueado para veículos leves.",
+    time: "Agora mesmo",
+    lat: -7.9412,
+    lng: -34.8765,
+    photos: []
   },
   {
-    q: "Qual é o número de emergência da Defesa Civil em Recife?",
-    options: ["190", "192", "193", "199"],
-    answer: 3,
-    explanation: "O número correto da Defesa Civil é 199. Guarde este número para emergências em dias de fortes chuvas."
+    id: 2,
+    location: "Av. Agamenon Magalhães — Derby, Recife",
+    severity: "grave",
+    desc: "Água na altura do pneu. Trânsito parado no sentido Boa Viagem.",
+    time: "Há 5 min",
+    lat: -8.0553,
+    lng: -34.8951,
+    photos: []
   },
   {
-    q: "Ao caminhar em áreas alagadas, qual é o principal risco invisível?",
-    options: ["Insectos voadores", "Bueiros abertos, fiação energizada e contaminação da água", "Perder os sapatos", "Chuva forte"],
-    answer: 1,
-    explanation: "A água pode esconder bueiros sem tampa, buracos e fiação elétrica caída, além de transmitir doenças como leptospirose."
+    id: 3,
+    location: "Av. Sigismundo Gonçalves — Carmo, Olinda",
+    severity: "moderado",
+    desc: "Alagamento junto ao meio-fio acumulando na descida do Varadouro.",
+    time: "Há 12 min",
+    lat: -8.0162,
+    lng: -34.8481,
+    photos: []
+  },
+  {
+    id: 4,
+    location: "Av. Barreto de Menezes — Prazeres, Jaboatão",
+    severity: "grave",
+    desc: "Ponto crítico próximo à estação do metrô. Evite a área.",
+    time: "Há 18 min",
+    lat: -8.1631,
+    lng: -34.9192,
+    photos: []
+  },
+  {
+    id: 5,
+    location: "Av. Belmino Correia — Timbi, Camaragibe",
+    severity: "leve",
+    desc: "Poças d'água acumuladas na faixa da direita, trânsito fluindo com lentidão.",
+    time: "Há 25 min",
+    lat: -8.0215,
+    lng: -34.9811,
+    photos: []
+  },
+  {
+    id: 6,
+    location: "Rodovia BR-104 — Maurício de Nassau, Caruaru",
+    severity: "moderado",
+    desc: "Acúmulo de água no viaduto de acesso ao centro.",
+    time: "Há 40 min",
+    lat: -8.2833,
+    lng: -35.9761,
+    photos: []
   }
 ];

@@ -1,80 +1,74 @@
-let authMode = 'login';
-const AUTH_KEY = 'alaga-map-auth-user';
-const USERS_KEY = 'alaga-map-demo-users';
-
-function getDemoUsers() {
-  try { 
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); 
-    return users && typeof users === 'object' ? users : {}; 
-  } catch (_) { 
-    return {}; 
-  }
-}
+const AUTH_KEY = 'alaga_map_user';
 
 function setAuthMode(mode) {
-  authMode = mode === 'signup' ? 'signup' : 'login';
-  const isSignup = authMode === 'signup';
-  
-  document.getElementById('login-tab').classList.toggle('active', !isSignup);
-  document.getElementById('signup-tab').classList.toggle('active', isSignup);
-  document.getElementById('auth-submit').textContent = isSignup ? 'Criar conta e entrar' : 'Entrar';
-  document.getElementById('auth-password').autocomplete = isSignup ? 'new-password' : 'current-password';
-  document.getElementById('auth-message').textContent = '';
+  const isLogin = mode === 'login';
+  document.getElementById('login-tab')?.classList.toggle('active', isLogin);
+  document.getElementById('signup-tab')?.classList.toggle('active', !isLogin);
+  document.getElementById('form-login')?.classList.toggle('hidden', !isLogin);
+  document.getElementById('form-signup')?.classList.toggle('hidden', isLogin);
+  const msgEl = document.getElementById('auth-message');
+  if (msgEl) msgEl.textContent = '';
 }
 
-function handleAuthSubmit(event) {
-  event.preventDefault();
-  const email = document.getElementById('auth-email').value.trim().toLowerCase();
-  const password = document.getElementById('auth-password').value;
-  const message = document.getElementById('auth-message');
-
-  if (!email || password.length < 6) {
-    message.textContent = 'Informe um e-mail válido e uma senha com pelo menos 6 caracteres.';
-    return;
+function toggleHouseNumber(checkbox) {
+  const numberInput = document.getElementById('signup-number');
+  if (numberInput) {
+    numberInput.disabled = checkbox.checked;
+    if (checkbox.checked) numberInput.value = '';
   }
+}
 
-  const users = getDemoUsers();
-
-  if (authMode === 'signup') {
-    if (users[email]) { 
-      message.textContent = 'Este e-mail já está cadastrado. Entre com sua senha.'; 
-      return; 
-    }
-    // Salva o novo usuário no localStorage
-    users[email] = password;
-    try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch (_) {}
-  } else {
-    // Se for login e já houver usuários cadastrados, valida a senha
-    if (Object.keys(users).length > 0 && users[email] && users[email] !== password) {
-      message.textContent = 'Senha incorreta para este e-mail.';
-      return;
-    }
-  }
-
-  // Guarda o e-mail ativo na sessão
-  try { localStorage.setItem(AUTH_KEY, email); } catch (_) {}
+function handleLoginSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  
+  // Dados padrão para login direto
+  const userData = {
+    email: email,
+    state: 'PE',
+    city: 'Recife',
+    neighborhood: 'Boa Vista'
+  };
+  
+  localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
   showApp();
 }
 
-function showApp() {
-  const authScreen = document.getElementById('auth-screen');
-  const appScreen = document.getElementById('app-screen');
+function handleSignupSubmit(e) {
+  e.preventDefault();
   
-  if (!authScreen || !appScreen) return;
-  authScreen.classList.add('hidden');
-  appScreen.classList.remove('hidden');
+  const userData = {
+    email: document.getElementById('signup-email').value.trim(),
+    phone: document.getElementById('signup-phone').value.trim(),
+    state: 'PE',
+    city: document.getElementById('signup-city').value.trim() || 'Recife',
+    neighborhood: document.getElementById('signup-neighborhood').value.trim() || 'Centro',
+    street: document.getElementById('signup-street').value.trim(),
+    number: document.getElementById('signup-number').value.trim()
+  };
 
-  if (!map && window.L) {
-    initMap();
-  } else if (map) {
-    setTimeout(() => map.invalidateSize(), 120);
+  localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+  showApp();
+}
+
+function getUserData() {
+  try {
+    return JSON.parse(localStorage.getItem(AUTH_KEY)) || { city: 'Recife', neighborhood: 'Boa Vista', state: 'PE' };
+  } catch (_) {
+    return { city: 'Recife', neighborhood: 'Boa Vista', state: 'PE' };
   }
 }
 
 function logout() {
-  try { localStorage.removeItem(AUTH_KEY); } catch (_) {}
-  document.getElementById('app-screen').classList.add('hidden');
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('auth-password').value = '';
-  setAuthMode('login');
+  localStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+function showApp() {
+  document.getElementById('auth-screen')?.classList.add('hidden');
+  document.getElementById('app-screen')?.classList.remove('hidden');
+  
+  if (typeof initMap === 'function') initMap();
+  if (typeof initLocationFilters === 'function') initLocationFilters();
+  if (typeof renderFeedItems === 'function') renderFeedItems();
 }

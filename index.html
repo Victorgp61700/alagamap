@@ -13,93 +13,136 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </head>
-<body class="bg-slate-900 text-slate-100 flex flex-col font-sans antialiased selection:bg-sky-500 selection:text-white">
+<body class="bg-[#12171e] text-slate-100 flex flex-col font-sans antialiased selection:bg-[#3b9ee4] selection:text-white">
 
   <!-- 1. TELA DE CARREGAMENTO (SPLASH SCREEN) -->
-  <div id="loading-screen" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
-    <div class="relative flex flex-col items-center">
-      <!-- Logo Maior e Sem Fundo Fixo na Splash Screen -->
-      <div class="w-32 h-32 flex items-center justify-center animate-bounce mb-2">
-        <img src="logo.png" alt="Alaga Map Logo" class="w-full h-full object-contain filter drop-shadow-lg">
+  <div id="loading-screen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo-wrapper">
+        <img src="logo.png" alt="Alaga Map Logo" class="splash-logo-img">
       </div>
-      <h1 class="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-sky-400 to-teal-300 bg-clip-text text-transparent">Alaga Map</h1>
-      <p class="text-xs text-slate-400 mt-1">Mapeamento comunitário de alagamentos</p>
+      <h1 class="splash-title">Alaga<span class="splash-title-highlight">MAP</span></h1>
+      <p class="splash-caption">Mapeamento comunitário de alagamentos</p>
 
-      <div class="mt-6 flex items-center gap-2">
-        <div class="w-2.5 h-2.5 bg-sky-400 rounded-full animate-ping"></div>
-        <span class="text-xs text-slate-400">Carregando dados...</span>
+      <div class="splash-loader">
+        <div class="splash-ping"></div>
+        <span class="splash-status">Carregando dados...</span>
       </div>
     </div>
   </div>
 
   <!-- 2. TELA DE LOGIN / CADASTRO -->
   <div id="auth-screen" class="auth-screen hidden">
-    <form id="auth-form" class="auth-card" onsubmit="handleAuthSubmit(event)">
-      <div class="auth-brand">
-        <!-- Logo Maior no Cartão de Auth -->
-        <div class="w-16 h-16 flex items-center justify-center shrink-0">
-          <img src="logo.png" alt="Logo" class="w-full h-full object-contain">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo-wrapper">
+          <img src="logo.png" alt="Alaga Map Logo" class="auth-logo-img">
         </div>
-        <span>Alaga Map</span>
+        <h1 class="auth-title">Alaga<span class="auth-title-highlight">MAP</span></h1>
       </div>
-      <p class="auth-caption">Acompanhe e compartilhe alertas de alagamento em Recife.</p>
+      <p class="auth-caption">Acompanhe e compartilhe alertas de alagamento em Pernambuco.</p>
       
       <div class="auth-tabs" role="tablist" aria-label="Acesso">
         <button id="login-tab" type="button" class="auth-tab active" onclick="setAuthMode('login')">Entrar</button>
         <button id="signup-tab" type="button" class="auth-tab" onclick="setAuthMode('signup')">Cadastrar</button>
       </div>
 
-      <label class="auth-label" for="auth-email">E-mail</label>
-      <input id="auth-email" type="email" autocomplete="email" required class="auth-input" placeholder="voce@exemplo.com">
-      
-      <label class="auth-label" for="auth-password">Senha</label>
-      <input id="auth-password" type="password" autocomplete="current-password" minlength="6" required class="auth-input" placeholder="Mínimo de 6 caracteres">
-      
-      <button id="auth-submit" type="submit" class="auth-submit">Entrar</button>
+      <!-- FORMULÁRIO DE LOGIN -->
+      <form id="form-login" onsubmit="handleLoginSubmit(event)">
+        <label class="auth-label" for="login-email">E-mail</label>
+        <input id="login-email" type="email" autocomplete="email" required class="auth-input" placeholder="voce@exemplo.com">
+        
+        <label class="auth-label" for="login-password">Senha</label>
+        <input id="login-password" type="password" autocomplete="current-password" minlength="6" required class="auth-input" placeholder="Mínimo de 6 caracteres">
+        
+        <button type="submit" class="auth-submit">Entrar</button>
+      </form>
+
+      <!-- FORMULÁRIO DE CADASTRO -->
+      <form id="form-signup" class="hidden" onsubmit="handleSignupSubmit(event)">
+        <label class="auth-label" for="signup-email">E-mail</label>
+        <input id="signup-email" type="email" autocomplete="email" required class="auth-input" placeholder="voce@exemplo.com">
+        
+        <label class="auth-label" for="signup-password">Senha</label>
+        <input id="signup-password" type="password" autocomplete="new-password" minlength="6" required class="auth-input" placeholder="Mínimo de 6 caracteres">
+
+        <label class="auth-label" for="signup-phone">Telefone:</label>
+        <input id="signup-phone" type="tel" required class="auth-input" placeholder="(81) 90000-0000">
+
+        <label class="auth-label" for="signup-state">Estado:</label>
+        <input id="signup-state" type="text" value="Pernambuco (PE)" readonly class="auth-input bg-slate-900/50 text-slate-400 cursor-not-allowed">
+
+        <label class="auth-label" for="signup-city">Cidade:</label>
+        <input id="signup-city" type="text" required class="auth-input" placeholder="Ex: Recife">
+
+        <label class="auth-label" for="signup-neighborhood">Bairro:</label>
+        <input id="signup-neighborhood" type="text" required class="auth-input" placeholder="Ex: Espinheiro">
+
+        <label class="auth-label" for="signup-street">Rua:</label>
+        <input id="signup-street" type="text" required class="auth-input" placeholder="Ex: Rua do Espinheiro">
+
+        <label class="auth-label" for="signup-number">Número da Casa:</label>
+        <input id="signup-number" type="text" class="auth-input" placeholder="Ex: 120">
+
+        <div class="auth-checkbox-group">
+          <input type="checkbox" id="signup-no-number" onchange="toggleHouseNumber(this)">
+          <label for="signup-no-number">Sem Número</label>
+        </div>
+
+        <button type="submit" class="auth-submit">Cadastrar</button>
+      </form>
+
       <p id="auth-message" class="auth-message" aria-live="polite"></p>
       <p class="auth-note">Demonstração: os dados ficam armazenados neste navegador.</p>
-    </form>
+    </div>
   </div>
 
   <!-- 3. TELA PRINCIPAL DA APLICAÇÃO -->
   <div id="app-screen" class="hidden">
-    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 px-4 py-3 shrink-0">
+    <header class="app-header border-b border-[#2d3748] sticky top-0 z-40 px-4 py-3 shrink-0">
       <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <!-- Logo Destaque e Maior no Cabeçalho -->
-          <div class="w-12 h-12 flex items-center justify-center shrink-0">
-            <img src="logo.png" alt="Logo" class="w-full h-full object-contain">
+          <div class="app-header-logo-wrapper">
+            <img src="logo.png" alt="Logo" class="app-header-logo-img">
           </div>
-          <div>
-            <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-sky-400 to-teal-300 bg-clip-text text-transparent">Alaga Map</span>
-            <span class="text-[10px] bg-sky-950 text-sky-400 border border-sky-800/80 px-2 py-0.5 rounded-full ml-1 font-semibold">Ao Vivo</span>
-          </div>
+          <span class="app-header-title">Alaga<span class="text-[#f28526]">MAP</span></span>
         </div>
+        
         <div class="flex items-center gap-2">
-          <button onclick="getUserLocation()" class="p-2.5 bg-slate-800 text-sky-400 border border-slate-700/80 rounded-xl hover:bg-slate-700 transition" title="Minha localização"><i class="fa-solid fa-crosshairs"></i></button>
-          <button onclick="toggleReportModal(true)" class="bg-gradient-to-r from-amber-500 to-red-600 text-white font-semibold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-amber-900/20"><i class="fa-solid fa-triangle-exclamation"></i><span>Reportar</span></button>
-          <button onclick="logout()" class="p-2.5 bg-slate-800 text-slate-300 border border-slate-700/80 rounded-xl hover:bg-slate-700 transition" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
+          <button onclick="toggleQuiz(true)" class="btn-quiz flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-question"></i>
+            <span class="hidden sm:inline">Quiz</span>
+          </button>
+
+          <button onclick="toggleReportModal(true)" class="btn-report flex items-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Reportar</span>
+          </button>
+
+          <button onclick="logout()" class="p-2.5 bg-[#1a222a] text-slate-300 border border-[#2d3748] rounded-xl hover:bg-[#232d38] transition" title="Sair">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
         </div>
       </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 pb-20 md:pb-6 flex flex-col gap-4">
       <div id="section-stats" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
-        <div class="stat-card"><div><p class="stat-label">Pontos Ativos</p><p class="stat-value" id="stat-active-count">4</p></div><i class="fa-solid fa-cloud-showers-heavy text-amber-400"></i></div>
+        <div class="stat-card"><div><p class="stat-label">Pontos Ativos</p><p class="stat-value" id="stat-active-count">6</p></div><i class="fa-solid fa-cloud-showers-heavy text-amber-400"></i></div>
         <div class="stat-card"><div><p class="stat-label">Nível na Região</p><p class="stat-value text-amber-400">Atenção</p></div><i class="fa-solid fa-shield-halved text-amber-400 pulse-alert"></i></div>
-        <div class="stat-card"><div><p class="stat-label">Alertas Graves</p><p class="stat-value text-rose-400" id="stat-critical-count">2</p></div><i class="fa-solid fa-circle-exclamation text-rose-400"></i></div>
-        <div class="stat-card"><div><p class="stat-label">Última Atualização</p><p class="stat-value text-sky-400">2 min</p></div><i class="fa-solid fa-arrows-rotate text-sky-400"></i></div>
+        <div class="stat-card"><div><p class="stat-label">Alertas Graves</p><p class="stat-value text-rose-400" id="stat-critical-count">3</p></div><i class="fa-solid fa-circle-exclamation text-rose-400"></i></div>
+        <div class="stat-card"><div><p class="stat-label">Última Atualização</p><p class="stat-value text-[#3b9ee4]">2 min</p></div><i class="fa-solid fa-arrows-rotate text-[#3b9ee4]"></i></div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
-        <section id="section-map" class="md:col-span-2 relative flex flex-col bg-slate-800/40 border border-slate-700/60 rounded-2xl p-1.5 sm:p-2 h-[calc(100vh-210px)] md:h-[550px] overflow-hidden">
+        <section id="section-map" class="md:col-span-2 relative flex flex-col bg-[#1a222a] border border-[#2d3748] rounded-2xl p-1.5 sm:p-2 h-[calc(100vh-210px)] md:h-[550px] overflow-hidden">
           <div class="absolute top-3 left-3 right-3 z-20 flex flex-col gap-2">
             <div class="relative w-full">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-              <input type="text" id="map-search" placeholder="Buscar bairro, rua ou localidade..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-sky-500" onkeydown="if(event.key==='Enter')searchLocation()">
-              <button onclick="searchLocation()" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-sky-400"><i class="fa-solid fa-arrow-right text-xs"></i></button>
+              <input type="text" id="map-search" placeholder="Buscar bairro, rua ou localidade..." class="w-full bg-[#12171e]/90 border border-[#2d3748] rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#f28526]" onkeydown="if(event.key==='Enter')searchLocation()">
+              <button onclick="searchLocation()" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-[#3b9ee4]"><i class="fa-solid fa-arrow-right text-xs"></i></button>
             </div>
-            <div class="no-scrollbar flex items-center gap-1.5 overflow-x-auto bg-slate-900/90 border border-slate-700 p-1 rounded-xl">
+            <div class="no-scrollbar flex items-center gap-1.5 overflow-x-auto bg-[#12171e]/90 border border-[#2d3748] p-1 rounded-xl">
               <button onclick="filterMap('todos',this)" class="filter-btn active-filter">Todos</button>
               <button onclick="filterMap('grave',this)" class="filter-btn">🔴 Grave</button>
               <button onclick="filterMap('moderado',this)" class="filter-btn">🟡 Moderado</button>
@@ -107,7 +150,7 @@
             </div>
           </div>
           <div id="map" class="shadow-inner"></div>
-          <div class="absolute bottom-3 left-3 right-3 sm:right-auto z-20 bg-slate-900/95 border border-slate-700 rounded-xl p-2.5">
+          <div class="absolute bottom-3 left-3 right-3 sm:right-auto z-20 bg-[#12171e]/95 border border-[#2d3748] rounded-xl p-2.5">
             <div class="flex items-center justify-between sm:justify-start gap-3 text-[11px] font-medium">
               <span><i class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></i>Passável</span>
               <span><i class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-1.5"></i>Moderado</span>
@@ -116,55 +159,115 @@
           </div>
         </section>
 
-        <aside id="section-feed" class="hidden md:flex bg-slate-800/40 border border-slate-700/60 rounded-2xl p-3 sm:p-4 flex-col h-[550px]">
-          <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-700/60">
-            <h2 class="font-bold text-sm"><i class="fa-solid fa-list-check text-sky-400 mr-2"></i>Relatos Recentes</h2>
-            <span class="text-[11px] text-slate-400">Recife, PE</span>
+        <!-- SECÇÃO DE RELATOS RECENTES -->
+        <aside id="section-feed" class="hidden md:flex bg-[#1a222a] border border-[#2d3748] rounded-2xl p-3 sm:p-4 flex-col h-[550px]">
+          <div class="flex flex-col gap-2 mb-3 pb-3 border-b border-[#2d3748]">
+            <div class="flex items-center justify-between">
+              <h2 class="font-bold text-sm"><i class="fa-solid fa-list-check text-[#3b9ee4] mr-2"></i>Relatos Recentes</h2>
+              <span id="user-location-badge" class="text-[10px] bg-[#3b9ee4]/10 text-[#3b9ee4] border border-[#3b9ee4]/30 px-2 py-0.5 rounded-full font-semibold max-w-[150px] truncate">PE</span>
+            </div>
+            
+            <!-- DROPDOWN DE FILTRO DE CIDADE PE -->
+            <div class="flex items-center gap-2 mt-1">
+              <i class="fa-solid fa-location-dot text-xs text-[#f28526]"></i>
+              <select id="location-filter" onchange="filterFeedByLocation(this.value)" class="w-full bg-[#12171e] border border-[#2d3748] text-xs text-slate-200 rounded-lg p-1.5 focus:outline-none focus:border-[#f28526]">
+                <option value="minha_zona">📍 Minha Região (Cadastrada)</option>
+                <option value="todos">Pernambuco (Todos)</option>
+                <option value="Recife">Recife</option>
+                <option value="Olinda">Olinda</option>
+                <option value="Jaboatão">Jaboatão dos Guararapes</option>
+                <option value="Camaragibe">Camaragibe</option>
+                <option value="Paulista">Paulista</option>
+                <option value="Caruaru">Caruaru</option>
+              </select>
+            </div>
           </div>
+
           <div id="reports-feed" class="flex-1 overflow-y-auto space-y-2.5 no-scrollbar"></div>
-          <div class="mt-3 pt-3 border-t border-slate-700/60 text-xs text-slate-400 flex justify-between">
-            <span>Defesa Civil: <strong>199</strong></span>
-            <a href="tel:199" class="text-sky-400 font-semibold hover:underline">Ligar</a>
+
+          <div class="mt-3 pt-3 border-t border-[#2d3748] text-xs text-slate-400 flex justify-between">
+            <span>Defesa Civil PE: <strong>199</strong></span>
+            <a href="tel:199" class="text-[#3b9ee4] font-semibold hover:underline">Ligar</a>
           </div>
         </aside>
       </div>
     </main>
 
     <!-- Navegação Mobile -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 z-40 flex justify-around py-2 safe-area-bottom">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-[#12171e]/95 border-t border-[#2d3748] z-40 flex justify-around py-2 safe-area-bottom">
       <button onclick="switchTab('map')" id="nav-btn-map" class="nav-btn active-nav"><i class="fa-solid fa-map"></i><span>Mapa</span></button>
       <button onclick="switchTab('feed')" id="nav-btn-feed" class="nav-btn"><i class="fa-solid fa-list-ul"></i><span>Relatos</span></button>
-      <button onclick="toggleReportModal(true)" class="nav-btn text-amber-400"><i class="fa-solid fa-plus"></i><span>Alertar</span></button>
+      <button onclick="toggleReportModal(true)" class="nav-btn text-[#f28526]"><i class="fa-solid fa-plus"></i><span>Alertar</span></button>
       <button onclick="switchTab('stats')" id="nav-btn-stats" class="nav-btn"><i class="fa-solid fa-chart-pie"></i><span>Status</span></button>
-      <button onclick="toggleQuiz(true)" class="nav-btn text-teal-300"><i class="fa-solid fa-circle-question"></i><span>Quiz</span></button>
+      <button onclick="toggleQuiz(true)" class="nav-btn text-[#3b9ee4]"><i class="fa-solid fa-circle-question"></i><span>Quiz</span></button>
     </nav>
 
-    <!-- Botão Quiz Desktop -->
-    <button id="quiz-launch" onclick="toggleQuiz(true)" class="hidden md:flex fixed top-[78px] right-5 z-30 items-center gap-2 rounded-xl bg-teal-600 hover:bg-teal-500 px-4 py-2.5 text-sm font-bold shadow-lg transition"><i class="fa-solid fa-circle-question"></i> Quiz de segurança</button>
-
-    <!-- Modal Reportar -->
+    <!-- MODAL REPORTAR COM CAMPOS DE ENDEREÇO SEPARADOS -->
     <div id="report-modal" class="modal-overlay" onclick="if(event.target===this)toggleReportModal(false)">
       <div id="report-modal-content" class="modal-panel">
-        <div class="flex items-center justify-between mb-5"><h2 class="text-lg font-bold">Reportar alagamento</h2><button onclick="toggleReportModal(false)" class="text-slate-400 hover:text-white p-2">✕</button></div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold">Reportar alagamento</h2>
+          <button type="button" onclick="toggleReportModal(false)" class="text-slate-400 hover:text-white p-2">✕</button>
+        </div>
+
         <form id="form-report" onsubmit="handleReportSubmit(event)">
-          <label for="input-location" class="block text-sm mb-1">Local</label>
-          <div class="flex gap-2 mb-4">
-            <input id="input-location" required class="min-w-0 flex-1 rounded-lg bg-slate-800 border border-slate-600 p-3 text-sm focus:outline-none focus:border-sky-500" placeholder="Rua ou bairro">
-            <button type="button" onclick="useCurrentLocation()" class="rounded-lg bg-slate-700 hover:bg-slate-600 px-3 text-sky-300 text-sm font-semibold transition">GPS</button>
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs text-slate-400">Preencha os dados da localização:</span>
+            <button type="button" onclick="useCurrentLocation()" class="rounded-lg bg-[#232d38] hover:bg-[#2d3748] px-3 py-1 text-[#3b9ee4] text-xs font-semibold transition flex items-center gap-1">
+              <i class="fa-solid fa-location-crosshairs"></i> Usar GPS
+            </button>
           </div>
+
+          <!-- Campos de Cidade e Bairro -->
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            <div>
+              <label for="input-city" class="block text-xs font-medium text-slate-300 mb-1">Cidade</label>
+              <select id="input-city" required class="w-full rounded-lg bg-[#12171e] border border-[#2d3748] p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#f28526]">
+                <option value="">Selecione...</option>
+                <option value="Recife">Recife</option>
+                <option value="Olinda">Olinda</option>
+                <option value="Jaboatão dos Guararapes">Jaboatão dos Guararapes</option>
+                <option value="Paulista">Paulista</option>
+                <option value="Camaragibe">Camaragibe</option>
+                <option value="Caruaru">Caruaru</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="input-neighborhood" class="block text-xs font-medium text-slate-300 mb-1">Bairro</label>
+              <input id="input-neighborhood" type="text" required class="w-full rounded-lg bg-[#12171e] border border-[#2d3748] p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#f28526]" placeholder="Ex: Mirueira">
+            </div>
+          </div>
+
+          <!-- Campos de Rua e Número -->
+          <div class="grid grid-cols-3 gap-2 mb-4">
+            <div class="col-span-2">
+              <label for="input-street" class="block text-xs font-medium text-slate-300 mb-1">Rua / Avenida</label>
+              <input id="input-street" type="text" required class="w-full rounded-lg bg-[#12171e] border border-[#2d3748] p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#f28526]" placeholder="Ex: Av. João Paulo II">
+            </div>
+
+            <div>
+              <label for="input-number" class="block text-xs font-medium text-slate-300 mb-1">Número</label>
+              <input id="input-number" type="text" class="w-full rounded-lg bg-[#12171e] border border-[#2d3748] p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#f28526]" placeholder="Ex: 294">
+            </div>
+          </div>
+
           <fieldset class="mb-4">
-            <legend class="text-sm mb-2 font-medium">Gravidade</legend>
-            <div class="flex gap-4 text-sm">
+            <legend class="text-xs font-medium text-slate-300 mb-2">Gravidade</legend>
+            <div class="flex gap-4 text-xs">
               <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="severity" value="leve" class="accent-emerald-500"> Leve</label>
               <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="severity" value="moderado" checked class="accent-amber-500"> Moderado</label>
               <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="severity" value="grave" class="accent-rose-500"> Grave</label>
             </div>
           </fieldset>
-          <label for="input-desc" class="block text-sm mb-1">Descrição</label>
-          <textarea id="input-desc" rows="3" class="w-full rounded-lg bg-slate-800 border border-slate-600 p-3 mb-4 text-sm focus:outline-none focus:border-sky-500" placeholder="Descreva a situação"></textarea>
-          <label for="input-photo" class="block text-sm mb-1">Foto (opcional, até 6 MB)</label>
-          <input id="input-photo" type="file" accept="image/*" class="w-full text-sm mb-5 text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-slate-200">
-          <button type="submit" class="w-full rounded-xl bg-sky-600 hover:bg-sky-500 py-3 font-semibold transition">Enviar alerta</button>
+
+          <label for="input-desc" class="block text-xs font-medium text-slate-300 mb-1">Descrição</label>
+          <textarea id="input-desc" rows="2" class="w-full rounded-lg bg-[#12171e] border border-[#2d3748] p-2.5 mb-4 text-xs text-slate-100 focus:outline-none focus:border-[#f28526]" placeholder="Descreva a situação do local"></textarea>
+
+          <label for="input-photo" class="block text-xs font-medium text-slate-300 mb-1">Foto (opcional, até 6 MB)</label>
+          <input id="input-photo" type="file" accept="image/*" class="w-full text-xs mb-5 text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#232d38] file:text-slate-200">
+
+          <button type="submit" class="w-full rounded-xl bg-[#f28526] hover:bg-[#e07418] py-3 font-semibold text-xs sm:text-sm transition text-white">Enviar alerta</button>
         </form>
       </div>
     </div>
@@ -173,10 +276,11 @@
     <div id="quiz-modal" class="modal-overlay quiz-overlay" onclick="if(event.target===this)toggleQuiz(false)">
       <section class="quiz-panel">
         <header class="quiz-header">
-          <div><p class="text-xs uppercase tracking-wider text-teal-300 font-bold">Aprenda e proteja-se</p><h2 class="text-xl font-extrabold">Quiz: alagamentos e cuidados</h2></div>
+          <div><p class="text-xs uppercase tracking-wider text-[#3b9ee4] font-bold">Aprenda e proteja-se</p><h2 class="text-xl font-extrabold">Quiz: alagamentos e cuidados</h2></div>
           <button onclick="toggleQuiz(false)" class="text-slate-400 hover:text-white p-2" aria-label="Fechar quiz">✕</button>
         </header>
-        <div class="quiz-progress"><span id="quiz-count">Questão 1 de 20</span><span id="quiz-score">Acertos: 0</span></div>
+        <!-- Atualizado para indicar 5 questões -->
+        <div class="quiz-progress"><span id="quiz-count">Questão 1 de 5</span><span id="quiz-score">Acertos: 0</span></div>
         <div class="quiz-track"><div id="quiz-progress-fill"></div></div>
         <div class="quiz-question-area">
           <h3 id="quiz-question" class="text-lg font-bold leading-snug"></h3>
@@ -184,8 +288,8 @@
           <p id="quiz-feedback" class="min-h-6 mt-3 text-sm font-semibold" aria-live="polite"></p>
         </div>
         <div class="quiz-actions">
-          <button id="quiz-next" onclick="nextQuizQuestion()" class="rounded-xl bg-teal-600 hover:bg-teal-500 px-5 py-3 font-bold disabled:opacity-40 transition" disabled>Próxima</button>
-          <button id="quiz-restart" onclick="restartQuiz()" class="hidden rounded-xl bg-slate-700 hover:bg-slate-600 px-5 py-3 font-bold transition">Refazer quiz</button>
+          <button id="quiz-next" onclick="nextQuizQuestion()" class="rounded-xl bg-[#3b9ee4] hover:bg-[#2b8cd2] px-5 py-3 font-bold disabled:opacity-40 transition text-white" disabled>Próxima</button>
+          <button id="quiz-restart" onclick="restartQuiz()" class="hidden rounded-xl bg-[#232d38] hover:bg-[#2d3748] px-5 py-3 font-bold transition">Refazer quiz</button>
         </div>
       </section>
     </div>
@@ -197,8 +301,8 @@
         <p id="street-desc" class="text-slate-300 text-sm mt-3"></p>
         <p id="street-time" class="text-slate-400 text-xs mt-2"></p>
         <div class="flex gap-4 mt-4 text-sm font-semibold">
-          <a id="maps-link" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:underline">Abrir no Google Maps ↗</a>
-          <a id="streetview-link" target="_blank" rel="noopener noreferrer" class="text-teal-400 hover:underline">Street View ↗</a>
+          <a id="maps-link" target="_blank" rel="noopener noreferrer" class="text-[#3b9ee4] hover:underline">Abrir no Google Maps ↗</a>
+          <a id="streetview-link" target="_blank" rel="noopener noreferrer" class="text-[#f28526] hover:underline">Street View ↗</a>
         </div>
         <div class="flex justify-between items-center mt-5 mb-2"><h3 class="font-semibold text-sm">Fotos</h3><span id="photo-count" class="text-xs text-slate-400"></span></div>
         <div id="street-photos" class="grid grid-cols-2 gap-2"></div>
@@ -207,7 +311,7 @@
     </div>
 
     <!-- Notificações Toast -->
-    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 -translate-y-20 opacity-0 transition-all duration-300 z-[70] bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 shadow-xl pointer-events-none">
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 -translate-y-20 opacity-0 transition-all duration-300 z-[70] bg-[#1a222a] border border-[#2d3748] rounded-xl px-4 py-3 shadow-xl pointer-events-none">
       <span id="toast-message" class="text-sm font-medium"></span>
     </div>
   </div>

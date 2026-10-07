@@ -9,10 +9,11 @@ html, body {
 
 body {
   min-height: 100vh;
-  background: #0f172a;
+  background: #12171e; /* Fundo grafite da logo */
   color: #f1f5f9;
 }
 
+/* LEAFLET E MAPA */
 #map {
   width: 100%;
   height: 100%;
@@ -26,7 +27,7 @@ body {
 }
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-  background: #0f172a;
+  background: #1a222a;
   color: #f8fafc;
 }
 
@@ -44,11 +45,16 @@ body {
   height: 36px !important;
   line-height: 36px !important;
   border-radius: 8px !important;
-  background: #0f172a !important;
+  background: #1a222a !important;
   color: #f8fafc !important;
-  border-color: #334155 !important;
+  border-color: #2d3748 !important;
 }
 
+.leaflet-control-attribution {
+  font-size: 9px !important;
+}
+
+/* ANIMAÇÕES E UTILITÁRIOS */
 .pulse-alert {
   animation: pulse 2s infinite;
 }
@@ -73,9 +79,10 @@ body {
   padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
+/* CARDS DE ESTATÍSTICA */
 .stat-card {
-  background: #1e293b99;
-  border: 1px solid #33415599;
+  background: #1a222a;
+  border: 1px solid #2d3748;
   border-radius: 1rem;
   padding: 1rem;
   display: flex;
@@ -99,6 +106,7 @@ body {
   margin-top: .15rem;
 }
 
+/* FILTROS E NAVEGAÇÃO */
 .filter-btn {
   flex: none;
   padding: .4rem .8rem;
@@ -110,7 +118,7 @@ body {
 }
 
 .active-filter {
-  background: #0284c7;
+  background: #3b9ee4;
   color: white;
 }
 
@@ -130,13 +138,14 @@ body {
 }
 
 .active-nav {
-  color: #38bdf8;
+  color: #3b9ee4;
 }
 
+/* MODAIS */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: #020617d9;
+  background: rgba(18, 23, 30, 0.85);
   backdrop-filter: blur(5px);
   z-index: 50;
   display: flex;
@@ -156,8 +165,8 @@ body {
 .modal-panel, .street-panel, .quiz-panel {
   width: 100%;
   max-width: 32rem;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: #1a222a;
+  border: 1px solid #2d3748;
   border-radius: 1.25rem;
   padding: 1.25rem;
   max-height: 90vh;
@@ -191,7 +200,7 @@ body {
 
 .quiz-track {
   height: 7px;
-  background: #1e293b;
+  background: #12171e;
   border-radius: 999px;
   margin-top: .6rem;
   overflow: hidden;
@@ -200,7 +209,7 @@ body {
 .quiz-track > div {
   height: 100%;
   width: 5%;
-  background: linear-gradient(90deg, #14b8a6, #38bdf8);
+  background: linear-gradient(90deg, #3b9ee4, #f28526);
   transition: width .25s;
 }
 
@@ -212,16 +221,16 @@ body {
   width: 100%;
   text-align: left;
   padding: .85rem 1rem;
-  border: 1px solid #334155;
-  background: #1e293b;
+  border: 1px solid #2d3748;
+  background: #12171e;
   border-radius: .8rem;
   color: #e2e8f0;
   transition: .15s;
 }
 
 .quiz-option:hover:not(:disabled) {
-  border-color: #2dd4bf;
-  background: #134e4a55;
+  border-color: #3b9ee4;
+  background: rgba(59, 158, 228, 0.15);
 }
 
 .quiz-option.correct {
@@ -250,42 +259,161 @@ body {
   max-width: 32rem;
 }
 
-.leaflet-control-attribution {
-  font-size: 9px !important;
+/* ========================================================
+   TELA DE CARREGAMENTO (SPLASH SCREEN)
+======================================================== */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at top, #232d38 0%, #12171e 80%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.splash-logo-wrapper {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
+  animation: splashBounce 2s infinite ease-in-out;
+}
+
+.splash-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.splash-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.splash-title-highlight {
+  color: #f28526;
+}
+
+.splash-caption {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.splash-loader {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.splash-ping {
+  width: 0.65rem;
+  height: 0.65rem;
+  background-color: #3b9ee4;
+  border-radius: 9999px;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.splash-status {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+@keyframes splashBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+
+/* ========================================================
+   TELA DE AUTENTICAÇÃO (LOGIN & CADASTRO)
+======================================================== */
 .auth-screen {
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 1.25rem;
-  background: radial-gradient(ellipse at top, #164e63 0%, #0f172a 55%);
+  background: radial-gradient(ellipse at top, #232d38 0%, #12171e 80%);
 }
 
 .auth-card {
-  width: min(100%, 26rem);
+  width: min(100%, 28rem);
   padding: 2rem;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: #1a222a;
+  border: 1px solid #2d3748;
   border-radius: 1.5rem;
-  box-shadow: 0 24px 70px #02061788;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
 }
 
-.auth-brand {
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.auth-logo-wrapper {
+  width: 88px;
+  height: 88px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: .75rem;
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #67e8f9;
+  margin-bottom: 0.75rem;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s ease;
 }
+
+.auth-logo-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.auth-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.auth-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-align: center;
+}
+
+.auth-title-highlight {
+  color: #f28526;
+}
+
 .auth-caption {
   text-align: center;
   color: #94a3b8;
-  font-size: .88rem;
-  line-height: 1.5;
-  margin: .85rem 0 1.5rem;
+  font-size: .85rem;
+  line-height: 1.4;
+  margin: .5rem 0 1.5rem;
 }
 
 .auth-tabs {
@@ -294,7 +422,7 @@ body {
   gap: .35rem;
   padding: .3rem;
   border-radius: .8rem;
-  background: #1e293b;
+  background: #12171e;
   margin-bottom: 1.35rem;
 }
 
@@ -303,15 +431,16 @@ body {
   border: 0;
   border-radius: .6rem;
   background: transparent;
-  color: #94a3b8;
+  color: #a0aec0;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .auth-tab.active {
-  background: #334155;
-  color: #f8fafc;
+  background: #2d3748;
+  color: #3b9ee4;
+  border-bottom: 2px solid #3b9ee4;
 }
 
 .auth-label {
@@ -326,16 +455,32 @@ body {
   width: 100%;
   padding: .8rem .9rem;
   border-radius: .7rem;
-  background: #1e293b;
-  border: 1px solid #475569;
+  background: #12171e;
+  border: 1px solid #2d3748;
   color: #f8fafc;
   outline: none;
   transition: all 0.2s;
 }
 
 .auth-input:focus {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 3px #0ea5e933;
+  border-color: #f28526;
+  box-shadow: 0 0 0 3px rgba(242, 133, 38, 0.2);
+}
+
+.auth-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.auth-checkbox-group input {
+  accent-color: #f28526;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
 }
 
 .auth-submit {
@@ -344,15 +489,15 @@ body {
   padding: .85rem;
   border: 0;
   border-radius: .75rem;
-  background: linear-gradient(90deg, #0284c7, #0d9488);
+  background: #f28526;
   color: white;
   font-weight: 800;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 
 .auth-submit:hover {
-  opacity: 0.95;
+  background: #e07418;
 }
 
 .auth-message {
@@ -370,6 +515,73 @@ body {
   margin: .25rem 0 0;
 }
 
+/* ========================================================
+   CABEÇALHO DA TELA PRINCIPAL
+======================================================== */
+.app-header {
+  background: rgba(26, 34, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #2d3748;
+}
+
+.app-header-logo-wrapper {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.app-header-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.app-header-title {
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.btn-quiz {
+  background: #3b9ee4;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-quiz:hover {
+  background: #2b8cd2;
+  transform: translateY(-1px);
+}
+
+.btn-report {
+  background: #f28526;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(242, 133, 38, 0.25);
+}
+
+.btn-report:hover {
+  background: #e07418;
+  transform: translateY(-1px);
+}
+
+/* RESPONSIVIDADE */
 @media(max-width:640px) {
   .quiz-panel {
     padding: 1.1rem;
@@ -381,29 +593,42 @@ body {
   .stat-value {
     font-size: 1.15rem;
   }
-  .quiz-launch {
-    display: none;
-  }
   .auth-card {
     padding: 1.5rem;
   }
 }
-.auth-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: .75rem;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #67e8f9;
+
+/* ========================================================
+   SEÇÃO DE RELATOS RECENTES (CORES DA LOGO)
+======================================================== */
+.report-feed-card {
+  background: #12171e; /* Fundo grafite da logo */
+  border: 1px solid #2d3748;
+  border-radius: 0.85rem;
+  padding: 0.85rem;
+  transition: all 0.2s ease;
 }
 
-.auth-icon {
+.report-feed-card:hover {
+  border-color: #3b9ee4; /* Destaque azul ao passar o mouse */
+  transform: translateY(-1px);
+}
+
+/* Botão Detalhes e Fotos com o azul da marca */
+.btn-report-details {
+  color: #3b9ee4;
+  font-size: 0.75rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: auto;
-  height: auto;
+  gap: 0.25rem;
   background: transparent;
-  border: none;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-report-details:hover {
+  color: #2b8cd2;
+  text-decoration: underline;
 }
