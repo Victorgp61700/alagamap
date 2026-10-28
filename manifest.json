@@ -10,7 +10,7 @@
     },
     {
       "src": "logo.png",
-      "sizes": "512x512",
+      "sizes": "514x514",
       "type": "image/png",
       "purpose": "any maskable"
     }
