@@ -1,17 +1,17 @@
 // sw.js
 const CACHE_NAME = 'alagamap-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/logo.png',
-  '/js/firebase.js',
-  '/js/data.js',
-  '/js/auth.js',
-  '/js/map.js',
-  '/js/report.js',
-  '/js/quiz.js',
-  '/js/app.js'
+  './',
+  './index.html',
+  './style.css',
+  './logo.png',
+  './js/firebase.js',
+  './js/data.js',
+  './js/auth.js',
+  './js/map.js',
+  './js/report.js',
+  './js/quiz.js',
+  './js/app.js'
 ];
 
 // Instalação do Service Worker
