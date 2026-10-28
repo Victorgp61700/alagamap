@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Alaga Map — Alagamentos em Recife</title>
+  <title>Alaga MAP — Alagamentos em Recife</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#12171e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AlagaMAP">
+  <link rel="apple-touch-icon" href="logo.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -49,7 +56,6 @@
 
       <!-- FORMULÁRIO DE LOGIN -->
       <form id="form-login" onsubmit="handleLoginSubmit(event)">
-        <label class="auth-label" for="login-nome">Nome do Usuário</label>
         <label class="auth-label" for="login-email">E-mail</label>
         <input id="login-email" type="email" autocomplete="email" required class="auth-input" placeholder="voce@exemplo.com">
         
@@ -94,7 +100,6 @@
       </form>
 
       <p id="auth-message" class="auth-message" aria-live="polite"></p>
-      <p class="auth-note">Demonstração: os dados ficam armazenados neste navegador.</p>
     </div>
   </div>
 
@@ -129,10 +134,10 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 pb-20 md:pb-6 flex flex-col gap-4">
       <div id="section-stats" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
-        <div class="stat-card"><div><p class="stat-label">Pontos Ativos</p><p class="stat-value" id="stat-active-count">6</p></div><i class="fa-solid fa-cloud-showers-heavy text-amber-400"></i></div>
+        <div class="stat-card"><div><p class="stat-label">Pontos Ativos</p><p class="stat-value" id="stat-active-count">0</p></div><i class="fa-solid fa-cloud-showers-heavy text-amber-400"></i></div>
         <div class="stat-card"><div><p class="stat-label">Nível na Região</p><p class="stat-value text-amber-400">Atenção</p></div><i class="fa-solid fa-shield-halved text-amber-400 pulse-alert"></i></div>
-        <div class="stat-card"><div><p class="stat-label">Alertas Graves</p><p class="stat-value text-rose-400" id="stat-critical-count">3</p></div><i class="fa-solid fa-circle-exclamation text-rose-400"></i></div>
-        <div class="stat-card"><div><p class="stat-label">Última Atualização</p><p class="stat-value text-[#3b9ee4]">2 min</p></div><i class="fa-solid fa-arrows-rotate text-[#3b9ee4]"></i></div>
+        <div class="stat-card"><div><p class="stat-label">Alertas Graves</p><p class="stat-value text-rose-400" id="stat-critical-count">0</p></div><i class="fa-solid fa-circle-exclamation text-rose-400"></i></div>
+        <div class="stat-card"><div><p class="stat-label">Última Atualização</p><p class="stat-value text-[#3b9ee4]">Em tempo real</p></div><i class="fa-solid fa-arrows-rotate text-[#3b9ee4]"></i></div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
@@ -168,11 +173,9 @@
               <span id="user-location-badge" class="text-[10px] bg-[#3b9ee4]/10 text-[#3b9ee4] border border-[#3b9ee4]/30 px-2 py-0.5 rounded-full font-semibold max-w-[150px] truncate">PE</span>
             </div>
             
-            <!-- DROPDOWN DE FILTRO DE CIDADE PE -->
             <div class="flex items-center gap-2 mt-1">
               <i class="fa-solid fa-location-dot text-xs text-[#f28526]"></i>
               <select id="location-filter" onchange="filterFeedByLocation(this.value)" class="w-full bg-[#12171e] border border-[#2d3748] text-xs text-slate-200 rounded-lg p-1.5 focus:outline-none focus:border-[#f28526]">
-                <option value="minha_zona">📍 Minha Região (Cadastrada)</option>
                 <option value="todos">Pernambuco (Todos)</option>
                 <option value="Recife">Recife</option>
                 <option value="Olinda">Olinda</option>
@@ -203,7 +206,7 @@
       <button onclick="toggleQuiz(true)" class="nav-btn text-[#3b9ee4]"><i class="fa-solid fa-circle-question"></i><span>Quiz</span></button>
     </nav>
 
-    <!-- MODAL REPORTAR COM CAMPOS DE ENDEREÇO SEPARADOS -->
+    <!-- MODAL REPORTAR -->
     <div id="report-modal" class="modal-overlay" onclick="if(event.target===this)toggleReportModal(false)">
       <div id="report-modal-content" class="modal-panel">
         <div class="flex items-center justify-between mb-4">
@@ -219,7 +222,6 @@
             </button>
           </div>
 
-          <!-- Campos de Cidade e Bairro -->
           <div class="grid grid-cols-2 gap-2 mb-3">
             <div>
               <label for="input-city" class="block text-xs font-medium text-slate-300 mb-1">Cidade</label>
@@ -240,7 +242,6 @@
             </div>
           </div>
 
-          <!-- Campos de Rua e Número -->
           <div class="grid grid-cols-3 gap-2 mb-4">
             <div class="col-span-2">
               <label for="input-street" class="block text-xs font-medium text-slate-300 mb-1">Rua / Avenida</label>
@@ -280,7 +281,6 @@
           <div><p class="text-xs uppercase tracking-wider text-[#3b9ee4] font-bold">Aprenda e proteja-se</p><h2 class="text-xl font-extrabold">Quiz: alagamentos e cuidados</h2></div>
           <button onclick="toggleQuiz(false)" class="text-slate-400 hover:text-white p-2" aria-label="Fechar quiz">✕</button>
         </header>
-        <!-- Atualizado para indicar 5 questões -->
         <div class="quiz-progress"><span id="quiz-count">Questão 1 de 5</span><span id="quiz-score">Acertos: 0</span></div>
         <div class="quiz-track"><div id="quiz-progress-fill"></div></div>
         <div class="quiz-question-area">
@@ -317,11 +317,23 @@
     </div>
   </div>
 
-  <script src="js/data.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/report.js"></script>
-  <script src="js/quiz.js"></script>
-  <script src="js/app.js"></script>
+  <!-- MÓDULOS JAVASCRIPT COM SUPORTE AO FIREBASE -->
+  <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/data.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/map.js"></script>
+  <script type="module" src="js/report.js"></script>
+  <script type="module" src="js/quiz.js"></script>
+  <script type="module" src="js/app.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+          .catch(err => console.error('Erro ao registrar Service Worker:', err));
+      });
+    }
+  </script>
 </body>
 </html>
