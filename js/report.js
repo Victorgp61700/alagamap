@@ -1,5 +1,7 @@
+// js/report.js
+
 import { db } from './firebase.js';
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, addDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { auth } from './firebase.js';
 
 let tempCoords = null;
@@ -16,7 +18,6 @@ export async function handleReportSubmit(e) {
   
   const fullLocationText = `${street}${number ? ', ' + number : ''} - ${neighborhood}, ${city}`;
   
-  // Monta uma string de busca estruturada otimizada para o Nominatim localizar o número exato
   const queryAddress = number 
     ? `${street}, ${number}, ${neighborhood}, ${city}, Pernambuco, Brasil`
     : `${street}, ${neighborhood}, ${city}, Pernambuco, Brasil`;
@@ -27,13 +28,11 @@ export async function handleReportSubmit(e) {
   let lng = -34.9;
 
   if (tempCoords) {
-    // Se usou o GPS do celular, prioriza a coordenada exata de hardware
     lat = tempCoords.lat;
     lng = tempCoords.lng;
     tempCoords = null;
   } else {
     try {
-      // 1. Tenta buscar com o endereço completo (incluindo o número)
       let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryAddress)}&limit=1&addressdetails=1`);
       let data = await response.json();
       
@@ -41,7 +40,6 @@ export async function handleReportSubmit(e) {
         lat = parseFloat(data[0].lat);
         lng = parseFloat(data[0].lon);
       } else if (number) {
-        // 2. Se o número específico falhar, tenta buscar apenas pela rua e bairro para não jogar o ponto para longe
         const fallbackQuery = `${street}, ${neighborhood}, ${city}, Pernambuco, Brasil`;
         response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}&limit=1`);
         data = await response.json();
@@ -83,6 +81,18 @@ export async function handleReportSubmit(e) {
   }
 }
 
+export async function deleteReport(reportId) {
+  if (!confirm('Deseja realmente excluir este relato?')) return;
+
+  try {
+    await deleteDoc(doc(db, "reports", reportId));
+    window.showNotificationToast('Relato excluído com sucesso!');
+  } catch (error) {
+    console.error("Erro ao excluir relato:", error);
+    window.showNotificationToast('Erro ao excluir o relato.');
+  }
+}
+
 export function toggleReportModal(open) {
   const modal = document.getElementById('report-modal');
   if (!modal) return;
@@ -106,5 +116,6 @@ export function useCurrentLocation() {
 }
 
 window.handleReportSubmit = handleReportSubmit;
+window.deleteReport = deleteReport;
 window.toggleReportModal = toggleReportModal;
 window.useCurrentLocation = useCurrentLocation;
