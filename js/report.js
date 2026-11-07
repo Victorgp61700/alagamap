@@ -1,18 +1,8 @@
-// js/report.js
-
 import { db } from './firebase.js';
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { auth } from './firebase.js';
 
-// Coordenadas centrais aproximadas para as cidades de Pernambuco
-const cityCoordinates = {
-  "Recife": { lat: -8.05428, lng: -34.8813 },
-  "Olinda": { lat: -8.0089, lng: -34.8553 },
-  "Jaboatão dos Guararapes": { lat: -8.1127, lng: -35.0158 },
-  "Paulista": { lat: -7.9408, lng: -34.8725 },
-  "Camaragibe": { lat: -8.0247, lng: -34.9819 },
-  "Caruaru": { lat: -8.2831, lng: -35.9758 }
-};
+let tempCoords = null;
 
 export async function handleReportSubmit(e) {
   e.preventDefault();
@@ -24,21 +14,57 @@ export async function handleReportSubmit(e) {
   const severity = document.querySelector('input[name="severity"]:checked')?.value || 'moderado';
   const desc = document.getElementById('input-desc').value.trim();
   
-  const fullLocation = `${street}${number ? ', ' + number : ''} - ${neighborhood}, ${city}`;
+  const fullLocationText = `${street}${number ? ', ' + number : ''} - ${neighborhood}, ${city}`;
+  
+  // Monta uma string de busca estruturada otimizada para o Nominatim localizar o número exato
+  const queryAddress = number 
+    ? `${street}, ${number}, ${neighborhood}, ${city}, Pernambuco, Brasil`
+    : `${street}, ${neighborhood}, ${city}, Pernambuco, Brasil`;
 
-  // Define as coordenadas com base na cidade selecionada ou usa Recife como padrão
-  let coords = cityCoordinates[city] || { lat: -8.055, lng: -34.9 };
+  window.showNotificationToast('Buscando coordenada exata do endereço...');
 
-  // Se houver suporte a GPS ativo ou se quisermos refinar, podemos usar
+  let lat = -8.055; // Fallback padrão
+  let lng = -34.9;
+
+  if (tempCoords) {
+    // Se usou o GPS do celular, prioriza a coordenada exata de hardware
+    lat = tempCoords.lat;
+    lng = tempCoords.lng;
+    tempCoords = null;
+  } else {
+    try {
+      // 1. Tenta buscar com o endereço completo (incluindo o número)
+      let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryAddress)}&limit=1&addressdetails=1`);
+      let data = await response.json();
+      
+      if (data && data.length > 0) {
+        lat = parseFloat(data[0].lat);
+        lng = parseFloat(data[0].lon);
+      } else if (number) {
+        // 2. Se o número específico falhar, tenta buscar apenas pela rua e bairro para não jogar o ponto para longe
+        const fallbackQuery = `${street}, ${neighborhood}, ${city}, Pernambuco, Brasil`;
+        response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}&limit=1`);
+        data = await response.json();
+        
+        if (data && data.length > 0) {
+          lat = parseFloat(data[0].lat);
+          lng = parseFloat(data[0].lon);
+        }
+      }
+    } catch (err) {
+      console.error("Erro na geocodificação:", err);
+    }
+  }
+
   const reportData = {
-    location: fullLocation,
+    location: fullLocationText,
     city: city,
     neighborhood: neighborhood,
     street: street,
     severity: severity,
     desc: desc,
-    lat: coords.lat,
-    lng: coords.lng,
+    lat: lat,
+    lng: lng,
     createdAt: serverTimestamp(),
     userId: auth.currentUser ? auth.currentUser.uid : null,
     photos: []
@@ -61,10 +87,6 @@ export function toggleReportModal(open) {
   const modal = document.getElementById('report-modal');
   if (!modal) return;
   modal.classList.toggle('modal-open', open);
-  
-  if (open) {
-    // Se o modal abrir, podemos preencher a cidade padrão do usuário se desejado
-  }
 }
 
 export function useCurrentLocation() {
@@ -76,9 +98,7 @@ export function useCurrentLocation() {
   window.showNotificationToast('Obtendo sua localização atual...');
   navigator.geolocation.getCurrentPosition(position => {
     const { latitude, longitude } = position.coords;
-    
-    // Armazena temporariamente para o próximo submit se necessário
-    window.tempUserCoords = { lat: latitude, lng: longitude };
+    tempCoords = { lat: latitude, lng: longitude };
     window.showNotificationToast('Localização obtida com sucesso via GPS!');
   }, () => {
     window.showNotificationToast('Não foi possível acessar o GPS.');
